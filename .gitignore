@@ -7,3 +7,6 @@ __pycache__
 processed_dataset/*
 dataset/*
 venv/*
+.idea
+.DS_Store
+src/.DS_Store
