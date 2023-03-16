@@ -11,7 +11,7 @@ When calculating the similarity between contracts, we define the similarity of c
 
 $$Sim(C_1, C_2) = \sum_{f_i \in C_1} log \frac{P(f_i, f_2^*)}{P(f_i, \bar{f_2})},$$
 
-where $f_i$ represents $C_1$'s $i$-th function, $f_2^*$ represents $C_2$'s most similar function to $f_1$, and $\bar{f_2}$ represents the mean of $C_2$'s all functions. $P(f_i, f_2^*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
+where $f_i$ represents $C_1$'s $i$-th function, $f_2^\*$ represents $C_2$'s most similar function to $f_1$, and $\bar{f_2}$ represents the mean of $C_2$'s all functions. $P(f_i, f_2^\*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^\*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
 
 $$P(f_i, f_j) = \frac{1}{1 + e^{-k * cos(f_i, f_2)}},$$
 
