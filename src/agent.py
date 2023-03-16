@@ -178,5 +178,6 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
             # normalize vectors row-wise
             vectors_norm = np.array(vectors) / np.linalg.norm(vectors, axis=1)[:, None]
             simil.add(vectors_norm)
+        cached_contract_creations.pop(attacker)
 
     return findings

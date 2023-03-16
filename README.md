@@ -25,7 +25,7 @@ Then, the confidence score will be calculated as $\frac{Sim(C_1, C_2) - t}{Sim(C
 
 ## Supported Chains
 
-All chains that Forta support
+All chains that Forta supports
 
 ## Alerts
 
@@ -49,14 +49,14 @@ All chains that Forta support
 ## Test Data
 
 ```shell
-npm run sequence tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632,0xe350cf63228ae2277b0e5b49089c6f255acd481cea19892749357fe74edbd0f7,tx0xa2819befc5c19c3a51fbbea8557e4dfebd2be41cdd7359462c18027a364e7fae,0xc3b228892e92ebf86f7e71bc202279a0a4863ca83f73fa7c8df9a592a59943cb,tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632
+npm run sequence tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632,0xe350cf63228ae2277b0e5b49089c6f255acd481cea19892749357fe74edbd0f7,tx0xa2819befc5c19c3a51fbbea8557e4dfebd2be41cdd7359462c18027a364e7fae,0xc3b228892e92ebf86f7e71bc202279a0a4863ca83f73fa7c8df9a592a59943cb,tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632,tx0x136454296922d5c6908061434dcd3645995fe9419a147d0fe5eab6d5eb8fea9a
 ```
 
 The above test script should raise alerts two times, one for the second transaction (starts with `tx`) and one for the third transaction.
 
 ## Train the model
 
-The model will be trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 function instructions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
+The model is trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 function instructions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
 
 ```shell
 python construct_dataset.py && python train.py
