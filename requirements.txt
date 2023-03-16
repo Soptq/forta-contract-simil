@@ -1,0 +1,7 @@
+forta_agent>=0.1.12
+setuptools>=61.3.1
+gensim
+cachetools
+faiss-cpu
+rlp
+evm_cfg_builder
