@@ -5,7 +5,7 @@
 This agent detects the creation of scam contracts based on bytecode similarities to known scam contracts provided by other forta bots like bot 0xf715450e392acb385eabdb8fc94278b3821d2c9a148de777726673895c7283a0.
 
 ## How does it work?
-This bot will listen to every contract creation event and retrieve the runtime bytecode of the created contract. Then a CFG of the bytecode will be built, and instructions of every function will be extracted to be vectorized using doc2vec model. Finally, the vectorized function features of the contract will be compared with the vectorized function features of the known scam contracts using FAISS. That is, this bot perform function-level semantic similarity detection.
+This bot will listen to every contract creation event and retrieve the runtime bytecode of the created contract. Then a CFG of the bytecode will be built, and instructions of every function will be extracted to be vectorized using doc2vec model. Finally, the vectorized function features of the contract will be compared with the vectorized function features of the known scam contracts using FAISS. That is, this bot performs function-level semantic similarity detection.
 
 When calculating the similarity between contracts, we define the similarity of contract $C_1$ and $C_2$ equals:
 
@@ -56,7 +56,7 @@ The above test script should raise alerts two times, one for the second transact
 
 ## Train the model
 
-The model is trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 function instructions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
+The model is trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 functions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
 
 ```shell
 python construct_dataset.py && python train.py
