@@ -53,3 +53,11 @@ npm run sequence tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92
 ```
 
 The above test script should raise alerts two times, one for the second transaction (starts with `tx`) and one for the third transaction.
+
+## Train the model
+
+The model will be trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 function instructions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
+
+```shell
+python construct_dataset.py && python train.py
+```
