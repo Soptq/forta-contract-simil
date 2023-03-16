@@ -52,7 +52,11 @@ def handle_transaction(transaction_event):
 
     # detect similarities
     bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
-    contract_irs = get_contract_ir(bytecode_hex)
+    try:
+        contract_irs = get_contract_ir(bytecode_hex)
+    except:
+        print("Unable to get contract IRs for contract: ", contract_address)
+        return findings
 
     vectors = []
     for function_irs in contract_irs:
@@ -158,7 +162,11 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
         created_contracts = cached_contract_creations.get(attacker)
         for contract_address in created_contracts:
             bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
-            contract_irs = get_contract_ir(bytecode_hex)
+            try:
+                contract_irs = get_contract_ir(bytecode_hex)
+            except:
+                print("Unable to get contract IRs for contract: ", contract_address)
+                continue
 
             new_scammer_id = len(scammers)
             new_scammer = {
