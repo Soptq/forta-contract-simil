@@ -84,14 +84,14 @@ def handle_transaction(transaction_event):
         )
 
         top_sim = sim[:, 0]
-
         average_sim = sim.mean(axis=1)
+
         top_prob = 1. / (1. + np.exp(-k * top_sim))
         average_prob = 1. / (1. + np.exp(-k * average_sim))
         prob_base = np.sum(np.log(1.0 / average_prob))
         prob_top = np.sum(np.log(top_prob / average_prob))
 
-        threshold = (lambd * prob_base - prob_top) / lambd * prob_base
+        threshold = (lambd * prob_base - prob_top) / (lambd * prob_base)
 
         if prob_top > most_similar_scammer_score:
             most_similar_scammer = scammer
