@@ -15,6 +15,7 @@ findings_count = 0
 dimension = 100
 k = 5
 lambd = 1
+threshold = 0.5
 
 model = Doc2Vec.load("src/doc2vec.model")
 simil = faiss.IndexFlatIP(100)
@@ -71,7 +72,6 @@ def handle_transaction(transaction_event):
 
     most_similar_scammer = None
     most_similar_scammer_score = 0.
-    most_similar_scammer_threshold = 0.0
     for scammer_id in scammer_ids:
         scammer = scammers[scammer_id]
         faiss_id_range = scammer["faiss_id_range"]
@@ -83,23 +83,14 @@ def handle_transaction(transaction_event):
             )
         )
 
-        top_sim = sim[:, 0]
-        average_sim = sim.mean(axis=1)
+        sim_score = sim[:, 0].mean()
 
-        top_prob = 1. / (1. + np.exp(-k * top_sim))
-        average_prob = 1. / (1. + np.exp(-k * average_sim))
-        prob_base = np.sum(np.log(1.0 / average_prob))
-        prob_top = np.sum(np.log(top_prob / average_prob))
-
-        threshold = (lambd * prob_base - prob_top) / (lambd * prob_base)
-
-        if prob_top > most_similar_scammer_score:
+        if sim_score > most_similar_scammer_score:
             most_similar_scammer = scammer
-            most_similar_scammer_score = prob_top
-            most_similar_scammer_threshold = threshold
+            most_similar_scammer_score = sim_score
 
-    if most_similar_scammer_score > most_similar_scammer_threshold:
-        confidence = float((most_similar_scammer_score - most_similar_scammer_threshold) / most_similar_scammer_score)
+    if most_similar_scammer_score > threshold:
+        confidence = float((most_similar_scammer_score - threshold) / (1. - threshold))
         findings.append(Finding({
             'name': f'similar scam contract detected',
             'description': f'{creator} created contract {contract_address}. It is similar to scam contract {most_similar_scammer["contract_address"]} created by {most_similar_scammer["creator"]}',

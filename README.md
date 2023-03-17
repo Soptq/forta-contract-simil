@@ -9,19 +9,13 @@ This bot will listen to every contract creation event and retrieve the runtime b
 
 When calculating the similarity between contracts, we define the similarity of contract $C_1$ and $C_2$ equals:
 
-$$Sim(C_1, C_2) = \sum_{f_i \in C_1} log \frac{P(f_i, f_2^*)}{P(f_i, \bar{f_2})},$$
+$$Sim(C_1, C_2) = \sum_{f_i \in C_1} \frac{P(f_i, f_2^*)}{|C_1|},$$
 
-where $f_i$ represents $C_1$'s $i$-th function, $f_2^\*$ represents $C_2$'s most similar function to $f_1$, and $\bar{f_2}$ represents the mean of $C_2$'s all functions. $P(f_i, f_2^\*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^\*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
+where $f_i$ represents $C_1$'s $i$-th function, $f_2^\*$ represents $C_2$'s most similar function to $f_1$. $P(f_i, f_2^\*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^\*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
 
 $$P(f_i, f_j) = \frac{1}{1 + e^{-k * cos(f_i, f_2)}},$$
 
 where $k$ is a hyperparameter and $cos(\cdot, \cdot)$ is the cosine similarity between two vectors.
-
-When calculating the confidence of the prediction, we first calculate the threshold of the similarity score as:
-
-$$t = \frac{\lambda Sim(C_1, C_1) - Sim(C_1, C_2)}{\lambda Sim(C_1, C_1)}$$
-
-Then, the confidence score will be calculated as $\frac{Sim(C_1, C_2) - t}{Sim(C_1, C_2)}$
 
 ## Supported Chains
 
