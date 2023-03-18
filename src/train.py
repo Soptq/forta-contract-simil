@@ -29,14 +29,15 @@ train_corpus = list(read_corpus("../processed_dataset"))
 model = gensim.models.doc2vec.Doc2Vec(
     vector_size=100,
     min_count=1,
-    epochs=20,
     workers=8,
-    dbow_words=1,
+    dm=0,
+    epochs=100,
     min_alpha=0.025,
-    alpha=0.025,
+    alpha=0.0001,
     window=15,
-    negative=5,
-    sample=1e-5,
+    hs=1,
+    negative=0,
+    sample=0.
 )
 model.build_vocab(train_corpus)
 model.train(train_corpus, total_examples=model.corpus_count, epochs=model.epochs)

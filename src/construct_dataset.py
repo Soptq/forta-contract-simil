@@ -25,9 +25,6 @@ if __name__ == '__main__':
 
     results = pool.imap_unordered(get_contract_ir, all_bytecodes)
     for i in tqdm(range(len(all_bytecodes))):
-        if i < 120000:
-            continue
-
         try:
             contract_irs = results.next(timeout=10)
         except Exception as e:

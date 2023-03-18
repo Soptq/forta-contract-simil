@@ -14,7 +14,6 @@ web3 = get_web3_provider()
 findings_count = 0
 dimension = 100
 k = 5
-lambd = 1
 threshold = 0.5
 
 model = Doc2Vec.load("src/doc2vec.model")
@@ -60,7 +59,7 @@ def handle_transaction(transaction_event):
         return findings
 
     vectors = []
-    for function_irs in contract_irs:
+    for function_irs in contract_irs.values():
         tokens = function_irs.split(" ")
         vectors.append(model.infer_vector(tokens))
     query = np.array(vectors)
@@ -83,11 +82,19 @@ def handle_transaction(transaction_event):
             )
         )
 
-        sim_score = sim[:, 0].mean()
+        top_sim = sim[:, 0]
+        average_sim = sim.mean(axis=1)
 
-        if sim_score > most_similar_scammer_score:
+        top_prob = 1. / (1. + np.exp(-k * top_sim))
+        average_prob = 1. / (1. + np.exp(-k * average_sim))
+        prob_base = np.sum(np.log(1.0 / average_prob))
+        prob_top = np.sum(np.log(top_prob / average_prob))
+
+        score = prob_top / prob_base
+
+        if score > most_similar_scammer_score:
             most_similar_scammer = scammer
-            most_similar_scammer_score = sim_score
+            most_similar_scammer_score = score
 
     if most_similar_scammer_score > threshold:
         confidence = float((most_similar_scammer_score - threshold) / (1. - threshold))
@@ -169,7 +176,7 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
             scammers.append(new_scammer)
 
             vectors = []
-            for function_irs in contract_irs:
+            for function_irs in contract_irs.values():
                 simil_index.append(new_scammer_id)
                 tokens = function_irs.split(" ")
                 vector = model.infer_vector(tokens)

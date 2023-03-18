@@ -9,15 +9,19 @@ This bot will listen to every contract creation event and retrieve the runtime b
 
 When calculating the similarity between contracts, we define the similarity of contract $C_1$ and $C_2$ equals:
 
-$$Sim(C_1, C_2) = \sum_{f_i \in C_1} \frac{P(f_i, f_2^*)}{|C_1|},$$
+$$Sim(C_1, C_2) = \sum_{f_i \in C_1} log \frac{P(f_i, f_2^*)}{P(f_i, \bar{f_2})},$$
 
-where $f_i$ represents $C_1$'s $i$-th function, $f_2^\*$ represents $C_2$'s most similar function to $f_1$. $P(f_i, f_2^\*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^\*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
+where $f_i$ represents $C_1$'s $i$-th function, $f_2^\*$ represents $C_2$'s most similar function to $f_1$, and $\bar{f_2}$ represents the mean of $C_2$'s all functions. $P(f_i, f_2^\*)$ and $P(f_i, \bar{f_2})$ are the probabilities of $f_i$ being semantically similar to $f_2^\*$ and $\bar{f_2}$ respectively. The probability $P(\cdot)$ is calculated by:
 
 $$P(f_i, f_j) = \frac{1}{1 + e^{-k * cos(f_i, f_2)}},$$
 
 where $k$ is a hyperparameter and $cos(\cdot, \cdot)$ is the cosine similarity between two vectors.
 
-## Supported Chains
+Finally, the similarity score will be normalized by:
+
+$$ score = \frac{Sim(C_1, C_2)}{Sim(C_1, C_1)}$$
+
+## Supported chains
 
 All chains that Forta supports
 
@@ -40,7 +44,7 @@ All chains that Forta supports
     - New scammer contract address will be set as `scam`
     - confidence will be calculated by the above mentioned equation.
 
-## Test Data
+## Test data
 
 ```shell
 npm run sequence tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632,0xe350cf63228ae2277b0e5b49089c6f255acd481cea19892749357fe74edbd0f7,tx0xa2819befc5c19c3a51fbbea8557e4dfebd2be41cdd7359462c18027a364e7fae,0xc3b228892e92ebf86f7e71bc202279a0a4863ca83f73fa7c8df9a592a59943cb,tx0x77ef021978dc893297a77a51990efab1ef9234006a1d97bb78678354d92de632,tx0x136454296922d5c6908061434dcd3645995fe9419a147d0fe5eab6d5eb8fea9a
@@ -50,8 +54,13 @@ The above test script should raise alerts two times, one for the second transact
 
 ## Train the model
 
-The model is trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 functions for our model to learn unsupervisedly. The training process takes roughly 1 hour on M1 Max.
+The model is trained on `slither-audited-smart-contracts` dataset. After processing there will be more than 2,000,000 functions for our model to learn unsupervisedly. The training process takes roughly 3 hour on M1 Max.
 
 ```shell
 python construct_dataset.py && python train.py
 ```
+
+## Future work
+
+1. Train with larger dataset, like [paradigm-data-portal](https://github.com/paradigmxyz/paradigm-data-portal).
+2. Flag precise malicious function calls. (require upstreaming flagging)
