@@ -49,6 +49,7 @@ def handle_transaction(transaction_event):
 
     if simil.ntotal == 0:
         return findings
+    print("Processing newly created contract: ", contract_address)
 
     # detect similarities
     bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
@@ -95,6 +96,8 @@ def handle_transaction(transaction_event):
         if score > most_similar_scammer_score:
             most_similar_scammer = scammer
             most_similar_scammer_score = score
+    print("score: ", most_similar_scammer_score)
+    print("scammer: ", most_similar_scammer)
 
     if most_similar_scammer_score > threshold:
         confidence = float((most_similar_scammer_score - threshold) / (1. - threshold))
@@ -139,6 +142,10 @@ def initialize():
         "alertConfig": {
             "subscriptions": [{
                 "botId": "0xf715450e392acb385eabdb8fc94278b3821d2c9a148de777726673895c7283a0",
+            }, {
+                "botId": "0x1d646c4045189991fdfd24a66b192a294158b839a6ec121d740474bdacb3ab23",
+            }, {
+                "botId": "0x80ed808b586aeebe9cdd4088ea4dea0a8e322909c0e4493c993e060e89c09ed1",
             }],
         }
     }
@@ -154,11 +161,13 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
     # detect some alert condition
     description = alert_event.alert.description
     # extract ethereum EOA from the description
-    attacker = re.findall(pattern='0x[a-fA-F0-9]{40}', string=description)[0].lower().strip()
+    attacker = re.findall(pattern='0x[a-fA-F0-9]{40} ', string=description)[0].lower().strip()
+    print(f"Receive alert, attacker: ", attacker)
     # add contracts to the index
     if attacker in cached_contract_creations:
         created_contracts = cached_contract_creations.get(attacker)
         for contract_address in created_contracts:
+            print(f"Processing attacker's contract: ", contract_address)
             bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
             try:
                 contract_irs = get_contract_ir(bytecode_hex)
