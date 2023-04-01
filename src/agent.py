@@ -31,11 +31,6 @@ def calc_contract_address(address, nonce):
 def handle_transaction(transaction_event):
     findings = []
 
-    # limiting this agent to emit only 5 findings so that the alert feed is not spammed
-    global findings_count
-    if findings_count >= 5:
-        return findings
-
     # only process contract creation transactions
     if transaction_event.to is not None:
         return findings
