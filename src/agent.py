@@ -11,7 +11,6 @@ import hashlib
 from src.utils import get_contract_ir
 
 web3 = get_web3_provider()
-findings_count = 0
 dimension = 100
 k = 5
 threshold = 0.5
@@ -132,7 +131,6 @@ def handle_transaction(transaction_event):
                 }),
             ]
         }))
-        findings_count += 1
 
     return findings
 
