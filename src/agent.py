@@ -82,11 +82,6 @@ def handle_transaction(transaction_event):
         for i in range(sim_unsorted.shape[0]):
             sim_unsorted[i] = sim[i, ind_argsort[i, :]]
 
-        print(sim)
-        print(ind)
-        print(sim_unsorted)
-        print("--------------")
-
         top_sim_target2from = sim_unsorted.max(axis=1)
         average_sim_target2from = sim_unsorted.mean(axis=1)
         top_sim_from2target = sim_unsorted.max(axis=0)
