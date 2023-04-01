@@ -47,14 +47,14 @@ def handle_transaction(transaction_event):
     else:
         cached_contract_creations[creator].append(contract_address)
 
+    print(f"[{simil.ntotal}] Processing newly created contract: {contract_address}")
     if simil.ntotal == 0:
         return findings
-    print("Processing newly created contract: ", contract_address)
 
     # detect similarities
     bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
     try:
-        contract_irs = get_contract_ir(bytecode_hex)
+        contract_irs = get_contract_ir(bytecode_hex, filter_attrs=["pure"])
     except:
         print("Unable to get contract IRs for contract: ", contract_address)
         return findings
@@ -83,16 +83,22 @@ def handle_transaction(transaction_event):
             )
         )
 
-        top_sim = sim[:, 0]
-        average_sim = sim.mean(axis=1)
+        top_sim_target2from = sim[:, 0]
+        average_sim_target2from = sim.mean(axis=1)
+        top_sim_from2target = sim.max(axis=0)
+        average_sim_from2target = sim.mean(axis=0)
 
-        top_prob = 1. / (1. + np.exp(-k * top_sim))
-        average_prob = 1. / (1. + np.exp(-k * average_sim))
-        prob_base = np.sum(np.log(1.0 / average_prob))
-        prob_top = np.sum(np.log(top_prob / average_prob))
+        top_prob_target2from = 1. / (1. + np.exp(-k * top_sim_target2from))
+        average_prob_target2from = 1. / (1. + np.exp(-k * average_sim_target2from))
+        prob_base_target2from = np.sum(np.log(1.0 / average_prob_target2from))
+        prob_top_target2from = np.sum(np.log(top_prob_target2from / average_prob_target2from))
 
-        score = prob_top / prob_base
+        top_prob_from2target = 1. / (1. + np.exp(-k * top_sim_from2target))
+        average_prob_from2target = 1. / (1. + np.exp(-k * average_sim_from2target))
+        prob_base_from2target = np.sum(np.log(1.0 / average_prob_from2target))
+        prob_top_from2target = np.sum(np.log(top_prob_from2target / average_prob_from2target))
 
+        score = prob_top_target2from / (2 * prob_base_target2from) + prob_top_from2target / (2 * prob_base_from2target)
         if score > most_similar_scammer_score:
             most_similar_scammer = scammer
             most_similar_scammer_score = score
@@ -162,7 +168,6 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
     description = alert_event.alert.description
     # extract ethereum EOA from the description
     attacker = re.findall(pattern='0x[a-fA-F0-9]{40} ', string=description)[0].lower().strip()
-    print(f"Receive alert, attacker: ", attacker)
     # add contracts to the index
     if attacker in cached_contract_creations:
         created_contracts = cached_contract_creations.get(attacker)
@@ -170,7 +175,7 @@ def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
             print(f"Processing attacker's contract: ", contract_address)
             bytecode_hex = web3.eth.get_code(Web3.toChecksumAddress(contract_address)).hex()
             try:
-                contract_irs = get_contract_ir(bytecode_hex)
+                contract_irs = get_contract_ir(bytecode_hex, filter_attrs=["pure"])
             except:
                 print("Unable to get contract IRs for contract: ", contract_address)
                 continue

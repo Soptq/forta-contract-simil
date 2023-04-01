@@ -1,10 +1,16 @@
 from evm_cfg_builder import CFG
 
 
-def get_contract_ir(bytecode_hex):
+def get_contract_ir(bytecode_hex, filter_attrs=None):
+    if filter_attrs is None:
+        filter_attrs = []
+
     cfg = CFG(bytecode_hex)
     contract_irs = {}
     for function in cfg.functions:
+        if hasattr(function, "attributes") and any([attr in filter_attrs for attr in function.attributes]):
+            continue
+
         irs = []
         for basic_block in function.basic_blocks:
             for ins in basic_block.instructions:
