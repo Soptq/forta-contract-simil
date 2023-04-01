@@ -1,6 +1,6 @@
 {
   "name": "forta-contract-simil",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "Forta agent detects the creation of scam contracts based on bytecode similarities to known scam contracts",
   "repository": "https://github.com/Soptq/forta-contract-simil",
   "chainIds": [

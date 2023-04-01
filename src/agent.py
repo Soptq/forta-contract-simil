@@ -14,7 +14,7 @@ from src.utils import get_contract_ir
 web3 = get_web3_provider()
 dimension = 100
 k = 5
-threshold = 0.5
+threshold = 0.75
 
 model = Doc2Vec.load("src/doc2vec.model")
 simil = faiss.IndexFlatIP(100)
