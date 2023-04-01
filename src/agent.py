@@ -7,6 +7,7 @@ from forta_agent import Finding, FindingType, FindingSeverity, Web3, get_web3_pr
 import cachetools
 from gensim.models import Doc2Vec
 import hashlib
+from copy import deepcopy
 
 from src.utils import get_contract_ir
 
@@ -76,11 +77,20 @@ def handle_transaction(transaction_event):
                 sel=faiss.IDSelectorRange(faiss_id_range[0], faiss_id_range[1])
             )
         )
+        sim_unsorted = deepcopy(sim)
+        ind_argsort = np.argsort(ind, axis=1)
+        for i in range(sim_unsorted.shape[0]):
+            sim_unsorted[i] = sim[i, ind_argsort[i, :]]
 
-        top_sim_target2from = sim[:, 0]
-        average_sim_target2from = sim.mean(axis=1)
-        top_sim_from2target = sim.max(axis=0)
-        average_sim_from2target = sim.mean(axis=0)
+        print(sim)
+        print(ind)
+        print(sim_unsorted)
+        print("--------------")
+
+        top_sim_target2from = sim_unsorted.max(axis=1)
+        average_sim_target2from = sim_unsorted.mean(axis=1)
+        top_sim_from2target = sim_unsorted.max(axis=0)
+        average_sim_from2target = sim_unsorted.mean(axis=0)
 
         top_prob_target2from = 1. / (1. + np.exp(-k * top_sim_target2from))
         average_prob_target2from = 1. / (1. + np.exp(-k * average_sim_target2from))
@@ -92,7 +102,8 @@ def handle_transaction(transaction_event):
         prob_base_from2target = np.sum(np.log(1.0 / average_prob_from2target))
         prob_top_from2target = np.sum(np.log(top_prob_from2target / average_prob_from2target))
 
-        score = prob_top_target2from / (2 * prob_base_target2from) + prob_top_from2target / (2 * prob_base_from2target)
+        # score = prob_top_target2from / (2 * prob_base_target2from) + prob_top_from2target / (2 * prob_base_from2target)
+        score = (prob_top_target2from + prob_top_from2target) / (prob_base_target2from + prob_base_from2target)
         if score > most_similar_scammer_score:
             most_similar_scammer = scammer
             most_similar_scammer_score = score
