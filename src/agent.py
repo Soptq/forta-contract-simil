@@ -163,6 +163,10 @@ def initialize():
 
 def handle_alert(alert_event: forta_agent.alert_event.AlertEvent):
     findings = []
+
+    if 'SIMILAR' in alert_event.alert_id:
+        return findings
+
     # detect some alert condition
     description = alert_event.alert.description
     # extract ethereum EOA from the description
